@@ -104,11 +104,15 @@ export class Discord {
       }
     });
 
-    const autocomplete = await this._assistant.createChatCompletion(conversations);
-    const result = splitMessage(autocomplete);
-
-    for (let i = 0; i < result.length; i++) {
-      await message.reply(result[i]);
+    try {
+      const autocomplete = await this._assistant.createChatCompletion(conversations);
+      const result = splitMessage(autocomplete);
+      for (let i = 0; i < result.length; i++) {
+        await message.reply(result[i]);
+      }
+    } catch (err) {
+      console.error(err)
+      await message.reply('Sorry, I am not feeling well today. Please try again later. :(')
     }
   };
 
