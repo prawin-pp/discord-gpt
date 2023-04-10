@@ -14,7 +14,6 @@ import { splitMessage } from './utils/message';
 
 interface DiscordConfig {
   token: string;
-  channelId: string;
   appId: string;
   guildId: string;
 }

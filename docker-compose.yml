@@ -1,0 +1,9 @@
+services:
+  bot:
+    build:
+      dockerfile: ./devtools/Dockerfile
+      context: .
+    restart: on-failure
+    image: discord-gpt:latest
+    volumes:
+      - .env:/app/.env
