@@ -6,6 +6,7 @@ import {
   Message,
   REST,
   Routes,
+  TextChannel,
   type Interaction
 } from 'discord.js';
 import type { ChatCompletionRequestMessage } from 'openai';
@@ -78,6 +79,11 @@ export class Discord {
     const isBotMessage = message.author.bot;
     if (isBotMessage) return;
 
+    if (message.content === '!clear' && message.channel instanceof TextChannel) {
+      await this._clearChat(message.channel)
+      return;
+    }
+
     await message.channel.sendTyping();
 
     const prev = await message.channel.messages.fetch({ limit: 20 });
@@ -136,4 +142,15 @@ export class Discord {
   private _onClientReady = (client: Client) => {
     console.info(`[DISCORD]: Ready! Logged in as ${client.user?.tag}`);
   };
+
+  private _clearChat = async (channel: TextChannel) => {
+    let messages: Collection<string, Message<boolean>>;
+    do {
+      messages = await channel.messages.fetch({ limit: 20 });
+      messages = messages.filter((msg) => msg.deletable);
+      if (messages.size > 0) {
+        await channel.bulkDelete(messages);
+      }
+    } while (messages?.size > 0);
+  }
 }
