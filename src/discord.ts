@@ -1,4 +1,12 @@
-import { Client, Collection, GatewayIntentBits, REST, Routes } from 'discord.js';
+import {
+  Client,
+  Collection,
+  Events,
+  GatewayIntentBits,
+  REST,
+  Routes,
+  type Interaction
+} from 'discord.js';
 import { clear } from './commands';
 
 interface DiscordConfig {
@@ -44,5 +52,42 @@ export class Discord {
     } catch (error) {
       console.error(error);
     }
+  }
+
+  start() {
+    this._client.once(Events.ClientReady, this._onClientReady);
+    this._client.on(Events.InteractionCreate, this._onInteractionCreate);
+    this._client.login(this._config.token);
+  }
+
+  private async _onInteractionCreate(interaction: Interaction) {
+    if (!interaction.isChatInputCommand()) return;
+
+    const command = interaction.client.commands.get(interaction.commandName);
+    if (!command) {
+      console.error(`[DISCORD]: No command matching ${interaction.commandName} was found.`);
+      return;
+    }
+
+    try {
+      await command.execute(interaction);
+    } catch (error) {
+      console.error(error);
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp({
+          content: 'There was an error while executing this command!',
+          ephemeral: true
+        });
+      } else {
+        await interaction.reply({
+          content: 'There was an error while executing this command!',
+          ephemeral: true
+        });
+      }
+    }
+  }
+
+  private _onClientReady(client: Client) {
+    console.info(`[DISCORD]: Ready! Logged in as ${client.user?.tag}`);
   }
 }
