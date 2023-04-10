@@ -1,8 +1,10 @@
 import { config } from './config';
 import { Discord } from './discord';
+import { OpenAI } from './openai';
 
-const discord = new Discord(config.discord);
+const openai = new OpenAI(config.chatGpt);
+const discord = new Discord(config.discord, openai);
 
 await discord.registerCommands();
 
-discord.start();
+await discord.start();

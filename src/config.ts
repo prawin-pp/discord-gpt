@@ -6,6 +6,8 @@ export const config = {
     guildId: import.meta.env.VITE_DISCORD_GUILD_ID
   },
   chatGpt: {
-    apiKey: import.meta.env.VITE_CHAT_GPT_API_KEY
+    apiKey: import.meta.env.VITE_CHAT_GPT_API_KEY,
+    model: import.meta.env.VITE_CHAT_GPT_MODEL,
+    maxTokens: parseInt(import.meta.env.VITE_CHAT_GPT_MAX_TOKENS)
   }
 };
