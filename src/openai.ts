@@ -3,6 +3,7 @@ import { Configuration, OpenAIApi, type ChatCompletionRequestMessage } from 'ope
 interface OpenAIConfig {
   apiKey: string;
   model: string;
+  maxTokens: number;
 }
 
 export class OpenAI {
@@ -22,7 +23,8 @@ export class OpenAI {
     ];
     const result = await this._client.createChatCompletion({
       model: this._config.model,
-      messages: messages
+      max_tokens: this._config.maxTokens,
+      messages: messages,
     });
 
     return result.data.choices?.[0]?.message?.content ?? `I don't know what to say.`;
