@@ -1,3 +1,4 @@
+// From: https://github.com/discordjs/discord.js/blob/v13/src/util/Util.js#L83
 export const splitMessage = (
   text: string,
   { maxLength = 2_000, char = '\n', prepend = '', append = '' } = {}
