@@ -1,5 +1,5 @@
 import type { Collection, Message } from 'discord.js';
-import type { Conversation } from 'src/discord';
+import type { Conversation } from '../models/discord';
 
 // From: https://github.com/discordjs/discord.js/blob/v13/src/util/Util.js#L83
 export const splitMessage = (

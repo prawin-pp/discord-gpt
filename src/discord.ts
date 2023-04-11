@@ -16,10 +16,6 @@ import { discordCommands } from './commands';
 import { Utils } from './utils';
 import { assembleChatCompletionRequest } from './utils/message';
 
-export interface Conversation extends ChatCompletionRequestMessage {
-  replyTo?: string;
-}
-
 interface DiscordConfig {
   token: string;
   appId: string;

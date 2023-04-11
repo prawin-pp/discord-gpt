@@ -4,7 +4,7 @@ import {
   TextChannel,
   type Interaction
 } from 'discord.js';
-import { clearConversations } from 'src/discord';
+import { clearConversations } from '../discord';
 
 export default {
   data: new SlashCommandBuilder().setName('clear').setDescription('Clear the chat'),
