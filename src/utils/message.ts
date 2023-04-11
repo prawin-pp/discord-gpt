@@ -1,3 +1,6 @@
+import type { Collection, Message } from 'discord.js';
+import type { Conversation } from 'src/discord';
+
 // From: https://github.com/discordjs/discord.js/blob/v13/src/util/Util.js#L83
 export const splitMessage = (
   text: string,
@@ -28,4 +31,25 @@ export const splitMessage = (
     msg += (msg && msg !== prepend ? char : '') + chunk;
   }
   return messages.concat(msg).filter((m) => m);
+};
+
+export const assembleChatCompletionRequest = (
+  senderId: string,
+  messages: Collection<string, Message<boolean>>
+): Array<Conversation> => {
+  const result: Array<Conversation> = [];
+  for (const [, message] of messages) {
+    if (message.author.bot && message.mentions.repliedUser?.id === senderId) {
+      const replyTo = message.reference?.messageId;
+      const conversation = result.find((item) => item.replyTo === replyTo);
+      if (conversation) {
+        conversation.content += `\n${message.content}`;
+      } else {
+        result.push({ role: 'assistant', content: message.content, replyTo: replyTo });
+      }
+    } else if (!message.author.bot && message.author.id === senderId) {
+      result.push({ role: 'user', content: message.content });
+    }
+  }
+  return result;
 };

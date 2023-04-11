@@ -1,3 +1,3 @@
 import clear from './clear';
 
-export { clear };
+export const discordCommands = [clear];
