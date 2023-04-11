@@ -1,0 +1,59 @@
+name: Deploy to production
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install SSH dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install openssh-client
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker image
+        id: build
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          file: ./devtools/Dockerfile
+          tags: ghcr.io/${{ github.actor }}/discord-gpt:latest
+          cache-from: type=registry,ref=ghcr.io/${{ github.actor }}/discord-gpt:buildcache
+          cache-to: type=registry,ref=ghcr.io/${{ github.actor }}/discord-gpt:buildcache,mode=max
+
+      - name: SSH command
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ secrets.SSH_WORKDIR }}
+            sed -i 's/VITE_CHAT_GPT_API_KEY=.*/VITE_CHAT_GPT_API_KEY=${{ secrets.VITE_CHAT_GPT_API_KEY }}/' .env
+            sed -i "s/VITE_CHAT_GPT_MODEL=.*/VITE_CHAT_GPT_MODEL=${{ secrets.VITE_CHAT_GPT_MODEL }}/" .env
+            sed -i "s/VITE_CHAT_GPT_MAX_TOKENS=.*/VITE_CHAT_GPT_MAX_TOKENS=${{ secrets.VITE_CHAT_GPT_MAX_TOKENS }}/" .env
+            sed -i "s/VITE_DISCORD_TOKEN=.*/VITE_DISCORD_TOKEN=${{ secrets.VITE_DISCORD_TOKEN }}/" .env
+            sed -i "s/VITE_DISCORD_APP_ID=.*/VITE_DISCORD_APP_ID=${{ secrets.VITE_DISCORD_APP_ID }}/" .env
+            sed -i "s/VITE_DISCORD_GUILD_ID=.*/VITE_DISCORD_GUILD_ID=${{ secrets.VITE_DISCORD_GUILD_ID }}/" .env
+            docker compose pull
+            docker compose down
+            docker compose up -d
