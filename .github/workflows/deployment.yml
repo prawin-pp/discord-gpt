@@ -67,6 +67,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd ${{ secrets.SSH_WORKDIR }}
+            export CR_PAT=${{ secrets.CICD_GITHUB_PAT }}
+            echo $CR_PAT | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             sed -i 's/VITE_CHAT_GPT_API_KEY=.*/VITE_CHAT_GPT_API_KEY=${{ secrets.VITE_CHAT_GPT_API_KEY }}/' .env
             sed -i "s/VITE_CHAT_GPT_MODEL=.*/VITE_CHAT_GPT_MODEL=${{ secrets.VITE_CHAT_GPT_MODEL }}/" .env
             sed -i "s/VITE_CHAT_GPT_MAX_TOKENS=.*/VITE_CHAT_GPT_MAX_TOKENS=${{ secrets.VITE_CHAT_GPT_MAX_TOKENS }}/" .env
