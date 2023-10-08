@@ -11,7 +11,7 @@ import {
   type ClientOptions,
   type Interaction
 } from 'discord.js';
-import type { ChatCompletionRequestMessage } from 'openai';
+import type { ChatCompletionMessage } from 'openai/resources/chat';
 import { discordCommands } from './commands';
 import { Utils } from './utils';
 import { assembleChatCompletionRequest } from './utils/message';
@@ -23,7 +23,7 @@ interface DiscordConfig {
 }
 
 interface Assistant {
-  createChatCompletion(chats: ChatCompletionRequestMessage[]): Promise<string>;
+  createChatCompletion(chats: ChatCompletionMessage[]): Promise<string>;
 }
 
 export class Discord {
@@ -133,6 +133,15 @@ export const clearConversations = async (channel: Channel) => {
     messages = await channel.messages.fetch({ limit: 20 });
     messages = messages.filter((msg) => msg.deletable);
     if (messages.size === 0) break;
-    await channel.bulkDelete(messages);
+    try {
+      await channel.bulkDelete(messages);
+    } catch (err) {
+      if ((err as any)?.code === 50034) {
+        await Promise.all(messages.map((msg) => msg.delete()));
+        break;
+      }
+      console.error(err);
+      break;
+    }
   } while (messages?.size > 0);
 };

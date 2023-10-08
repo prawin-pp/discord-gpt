@@ -1,4 +1,5 @@
-import { Configuration, OpenAIApi, type ChatCompletionRequestMessage } from 'openai';
+import { OpenAI as OpenAIApi } from 'openai';
+import type { ChatCompletionMessage } from 'openai/resources/chat';
 
 interface OpenAIConfig {
   apiKey: string;
@@ -11,22 +12,20 @@ export class OpenAI {
   private _config: OpenAIConfig;
 
   constructor(config: OpenAIConfig) {
-    const configuration = new Configuration({ apiKey: config.apiKey });
-    this._client = new OpenAIApi(configuration);
+    this._client = new OpenAIApi({ apiKey: config.apiKey });
     this._config = config;
   }
 
-  async createChatCompletion(chats: ChatCompletionRequestMessage[]) {
-    const messages: ChatCompletionRequestMessage[] = [
+  async createChatCompletion(chats: ChatCompletionMessage[]) {
+    const messages: ChatCompletionMessage[] = [
       { role: 'system', content: 'You are a friendly and clever chatbot.' },
       ...chats.map((chat) => ({ role: chat.role, content: chat.content }))
     ];
-    const result = await this._client.createChatCompletion({
+    const result = await this._client.chat.completions.create({
       model: this._config.model,
       max_tokens: this._config.maxTokens,
-      messages: messages,
+      messages: messages
     });
-
-    return result.data.choices?.[0]?.message?.content ?? `I don't know what to say.`;
+    return result.choices?.[0]?.message?.content ?? `I don't know what to say.`;
   }
 }

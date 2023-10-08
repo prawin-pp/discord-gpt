@@ -1,5 +1,5 @@
-import type { ChatCompletionRequestMessage } from 'openai';
+import type { ChatCompletionMessage } from 'openai/resources/chat';
 
-export interface Conversation extends ChatCompletionRequestMessage {
+export interface Conversation extends ChatCompletionMessage {
   replyTo?: string;
 }
