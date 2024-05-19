@@ -1,5 +1,5 @@
 import type { Collection, Message } from 'discord.js';
-import type { Conversation } from '../models/discord';
+import type { CreateChatCompletionRequest } from '../types/openai';
 
 // From: https://github.com/discordjs/discord.js/blob/v13/src/util/Util.js#L83
 export const splitMessage = (
@@ -36,20 +36,17 @@ export const splitMessage = (
 export const assembleChatCompletionRequest = (
   senderId: string,
   messages: Collection<string, Message<boolean>>
-): Array<Conversation> => {
-  const result: Array<Conversation> = [];
+): CreateChatCompletionRequest[] => {
+  const results: CreateChatCompletionRequest[] = [];
+
   for (const [, message] of messages) {
-    if (message.author.bot && message.mentions.repliedUser?.id === senderId) {
-      const replyTo = message.reference?.messageId;
-      const conversation = result.find((item) => item.replyTo === replyTo);
-      if (conversation) {
-        conversation.content += `\n${message.content}`;
-      } else {
-        result.push({ role: 'assistant', content: message.content, replyTo: replyTo });
-      }
-    } else if (!message.author.bot && message.author.id === senderId) {
-      result.push({ role: 'user', content: message.content });
+    const isAssistant = message.author.bot && message.mentions.repliedUser?.id === senderId;
+    const isUser = !message.author.bot && message.author.id === senderId;
+    if (isUser) {
+      results.push({ role: 'user', content: message.content });
+    } else if (isAssistant) {
+      results.push({ role: 'assistant', content: message.content });
     }
   }
-  return result;
+  return results;
 };

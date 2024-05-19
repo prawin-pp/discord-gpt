@@ -11,7 +11,10 @@ import {
   type ClientOptions,
   type Interaction
 } from 'discord.js';
-import type { ChatCompletionMessage } from 'openai/resources/chat';
+import type {
+  ChatCompletionAssistantMessageParam,
+  ChatCompletionUserMessageParam
+} from 'openai/resources/chat';
 import { discordCommands } from './commands';
 import { Utils } from './utils';
 import { assembleChatCompletionRequest } from './utils/message';
@@ -23,7 +26,9 @@ interface DiscordConfig {
 }
 
 interface Assistant {
-  createChatCompletion(chats: ChatCompletionMessage[]): Promise<string>;
+  createChatCompletion(
+    chats: Array<ChatCompletionUserMessageParam | ChatCompletionAssistantMessageParam>
+  ): Promise<string>;
 }
 
 export class Discord {
@@ -68,8 +73,10 @@ export class Discord {
 
     try {
       await message.channel.sendTyping();
-      const chatHistory = (await message.channel.messages.fetch({ limit: 20 })).reverse();
-      const req = assembleChatCompletionRequest(message.author.id, chatHistory);
+
+      const messages = (await message.channel.messages.fetch({ limit: 20 })).reverse();
+      const req = assembleChatCompletionRequest(message.author.id, messages);
+
       const autocomplete = await this._assistant.createChatCompletion(req);
       const result = Utils.splitMessage(autocomplete);
       for (let i = 0; i < result.length; i++) {
@@ -77,7 +84,7 @@ export class Discord {
       }
     } catch (err) {
       console.error(err);
-      await message.reply('Sorry, I am not feeling well today. Please try again later. :(');
+      await message.reply(`Sorry, I had an issue processing your request`);
     }
   };
 
