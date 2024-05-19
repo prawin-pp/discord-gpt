@@ -11,21 +11,34 @@ export default {
     .setName('openai')
     .setDescription('Setup OpenAI chatbot')
     .addStringOption((option) =>
-      option.setName('system').setDescription('The command to run').setRequired(true)
+      option
+        .setName('system_message')
+        .setDescription('Update system message')
+        .setRequired(true)
+        .addChoices([
+          { name: 'get', value: 'get' },
+          { name: 'set', value: 'set' }
+        ])
+    )
+    .addStringOption((option) =>
+      option.setName('input').setDescription('Input for settings').setRequired(false)
     ),
   async execute(interaction: Interaction) {
     const isChatCommand = interaction instanceof ChatInputCommandInteraction;
     const isTextChannel = interaction.channel instanceof TextChannel;
     if (!isChatCommand || !isTextChannel) return;
 
-    const command = interaction.options.getString('system');
-    if (!command) return;
+    const command = interaction.options.getString('system_message');
+    const input = interaction.options.getString('input');
 
-    const old = OpenAI.systemMessage.content;
-    await interaction.channel.send(
-      `Current system message: \`${old}\`\n\nNew system message: \`${command}\``
-    );
-
-    OpenAI.systemMessage.content = command;
+    if (command === 'get') {
+      await interaction.reply(`Current system message: \`${OpenAI.systemMessage.content}\``);
+    } else if (command === 'set' && input) {
+      const current = OpenAI.systemMessage.content;
+      await interaction.reply(
+        `Current system message: \`${current}\`\n\nNew system message: \`${input}\``
+      );
+      OpenAI.systemMessage.content = input;
+    }
   }
 };
