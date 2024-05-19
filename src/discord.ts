@@ -135,8 +135,8 @@ export const clearConversations = async (channel: Channel) => {
     if (messages.size === 0) break;
     try {
       await channel.bulkDelete(messages);
-    } catch (err) {
-      if ((err as any)?.code === 50034) {
+    } catch (err: any) {
+      if (err?.code === 50034) {
         await Promise.all(messages.map((msg) => msg.delete()));
         break;
       }
