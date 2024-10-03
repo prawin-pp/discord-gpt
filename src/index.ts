@@ -1,4 +1,5 @@
 import { config } from './config';
+import './cronjob';
 import { Discord } from './discord';
 import { OpenAI } from './openai';
 
