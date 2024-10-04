@@ -17,7 +17,8 @@ cron.schedule(config.apple.crontab, async () => {
     Object.keys(store.partsAvailability).forEach((key) => {
       const part = store.partsAvailability[key];
       const { messageTypes, buyability } = part;
-      const { storePickupLabel, storePickupProductTitle } = messageTypes.compact;
+      const { storePickupLabel, storePickupProductTitle } =
+        messageTypes.regular || messageTypes.compact;
       if (buyability.isBuyable) {
         prev.push(`${storePickupLabel} ${storeName} ${storePickupProductTitle}`);
       }
@@ -28,6 +29,7 @@ cron.schedule(config.apple.crontab, async () => {
   if (items.length > 0) {
     console.log(`Found ${items.length} items`);
     const msg = items.join('\n');
-    await axios.post(config.apple.webhook, { content: msg });
+    const resp = await axios.post(config.apple.webhook, { content: msg });
+    console.log(`Webhook response: ${resp.status} ${resp.data}`);
   }
 });
