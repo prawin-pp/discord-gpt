@@ -28,7 +28,7 @@ COPY package*.json ./
 RUN npm ci --production
 
 # Install Playwright browsers
-RUN npx playwright install chromium --with-deps
+RUN npx playwright install --with-deps
 
 COPY ./src ./src
 
