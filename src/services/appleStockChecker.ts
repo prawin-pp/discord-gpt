@@ -231,7 +231,6 @@ export class AppleStockChecker {
 
       page.on('response', async (response) => {
         const url = response.url();
-        console.log(url);
         if (
           (url.includes('fulfillment-messages') || url.includes('pickup-message')) &&
           url.includes(postcode)
@@ -252,7 +251,6 @@ export class AppleStockChecker {
     const items: StockItem[] = [];
 
     try {
-      console.log(JSON.stringify(data?.body, null, 2));
       const stores = data?.body?.content?.pickupMessage?.stores || [];
 
       for (const store of stores) {
