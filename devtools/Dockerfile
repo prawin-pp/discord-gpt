@@ -1,6 +1,7 @@
 FROM node:lts
 
 WORKDIR /app
+ENV PLAYWRIGHT_BROWSERS_PATH=/app/playwright-browsers
 
 # Install Playwright dependencies
 RUN apt-get update && apt-get install -y \
@@ -28,7 +29,7 @@ COPY package*.json ./
 RUN npm ci --production
 
 # Install Playwright browsers
-RUN npx playwright install --with-deps
+RUN npx -y playwright install chromium --with-deps
 
 COPY ./src ./src
 
