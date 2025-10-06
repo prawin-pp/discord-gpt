@@ -11,8 +11,10 @@ export const config = {
     maxTokens: parseInt(import.meta.env.VITE_CHAT_GPT_MAX_TOKENS)
   },
   apple: {
-    crontab: import.meta.env.VITE_APPLE_CRONTAB || `*/10 * * * *`,
+    crontab: import.meta.env.VITE_APPLE_CRONTAB || `*/2 * * * *`,
     link: import.meta.env.VITE_APPLE_LINK,
-    webhook: import.meta.env.VITE_APPLE_WEBHOOK
+    link2: import.meta.env.VITE_APPLE_LINK_2,
+    webhook: import.meta.env.VITE_APPLE_WEBHOOK,
+    postcode: import.meta.env.VITE_APPLE_POSTCODE || '10150'
   }
 };

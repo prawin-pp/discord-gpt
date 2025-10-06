@@ -7,6 +7,11 @@ interface ImportMetaEnv {
   readonly VITE_DISCORD_TOKEN: string;
   readonly VITE_DISCORD_APP_ID: string;
   readonly VITE_DISCORD_GUILD_ID: string;
+  readonly VITE_APPLE_CRONTAB: string;
+  readonly VITE_APPLE_LINK: string;
+  readonly VITE_APPLE_LINK_2: string;
+  readonly VITE_APPLE_WEBHOOK: string;
+  readonly VITE_APPLE_POSTCODE: string;
 }
 
 interface ImportMeta {
